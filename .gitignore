@@ -1,6 +1,6 @@
 *.class
 
-**/*.png
+*.png
 # Package Files #
 *.jar
 *.war

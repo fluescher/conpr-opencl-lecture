@@ -1,5 +1,6 @@
 package ch.fhnw.conpr.mandel;
 
+import com.amd.aparapi.Device;
 import com.amd.aparapi.Kernel;
 import com.amd.aparapi.Range;
 
@@ -8,19 +9,35 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 	public static class MandelbrotKernel extends Kernel {
 		public static final int MAX_ITERATIONS = 255;
 
-		public static final double RE_MIN = -2;
-		public static final double RE_MAX = 2;
-		public static final double IM_MIN = -2;
-		public static final double IM_MAX = 2;
+		public static final float RE_MIN = -2;
+		public static final float RE_MAX = 2;
+		public static final float IM_MIN = -2;
+		public static final float IM_MAX = 2;
 		private final int[] rgb;
-		
-		public MandelbrotKernel(int[] rgb) {
-			this.rgb = rgb;
+		private final int width;
+		private final int height;
+		private final float RE_PER_PIXEL;
+		private final float IM_PER_PIXEL;
+
+		public MandelbrotKernel(int width, int height) {
+			this.rgb = new int[width * height];
+			RE_PER_PIXEL = (MandelbrotKernel.RE_MAX - MandelbrotKernel.RE_MIN)/ width;
+			IM_PER_PIXEL = (MandelbrotKernel.IM_MAX - MandelbrotKernel.IM_MIN)/ height;
+			this.width = width;
+			this.height = height;
 		}
 		
 		@Override
 		public void run() {
-			// TODO Implement Opencl Mandelbrot kernel
+			int x = getGlobalId(0);
+			int y = getGlobalId(1);
+			
+			if(x > width || y > height) return;
+			
+			float re = MandelbrotKernel.RE_MIN + x * RE_PER_PIXEL; // map pixel to complex plane
+			float im = MandelbrotKernel.IM_MIN + y * IM_PER_PIXEL; // map pixel to complex plane
+			
+			rgb[x*width + y] = MandelbrotKernel.mandel(re, im);
 		}
 		
 		/**
@@ -34,13 +51,13 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 		 *            imaginary part
 		 * @return the number of iterations
 		 */
-		public int mandel(double cre, double cim) {
-			double re = 0.0;
-			double im = 0.0;
+		public static int mandel(float cre, float cim) {
+			float re = 0.0f;
+			float im = 0.0f;
 			int iterations = 0;
 			while (re * re + im * im <= 4 && iterations < MAX_ITERATIONS) {
-				double re1 = re * re - im * im + cre;
-				double im1 = 2 * re * im + cim;
+				float re1 = re * re - im * im + cre;
+				float im1 = 2 * re * im + cim;
 				re = re1;
 				im = im1;
 				iterations++;
@@ -53,12 +70,31 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 		}
 	}
 	
+	private final Device device;
+	private final String name;
+	
+	public AparapiMandelbrotCalculator() {
+		name = "Aprapi on " + Device.best().getType();
+		device = Device.best();
+	}
+	
+	public AparapiMandelbrotCalculator(String name, Device device) {
+		this.device = device;
+		this.name = name;
+	}
+	
 	@Override
 	public int[] calculateMandelbrotIterations(int width, int height) {
-		MandelbrotKernel kernel = new MandelbrotKernel(new int[width * height]);
+		MandelbrotKernel kernel = new MandelbrotKernel(width, height);
 		
-		kernel.execute(Range.create2D(width, height));
+		kernel.execute(Range.create2D(device, width, height, 1, 32));
+		kernel.dispose();
 		
 		return kernel.getInterations();
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }
