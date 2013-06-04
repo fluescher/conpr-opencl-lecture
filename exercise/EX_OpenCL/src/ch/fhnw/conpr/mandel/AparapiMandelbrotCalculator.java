@@ -87,7 +87,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 	public int[] calculateMandelbrotIterations(int width, int height) {
 		MandelbrotKernel kernel = new MandelbrotKernel(width, height);
 		
-		kernel.execute(Range.create2D(device, width, height, 1, 32));
+		kernel.execute(Range.create2D(device, width, height));
 		kernel.dispose();
 		
 		return kernel.getInterations();
