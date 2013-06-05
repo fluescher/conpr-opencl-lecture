@@ -74,8 +74,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 	private final String name;
 	
 	public AparapiMandelbrotCalculator() {
-		name = "Aprapi on " + Device.best().getType();
-		device = Device.best();
+		this("Aprapi on " + Device.best().getType(), Device.best());
 	}
 	
 	public AparapiMandelbrotCalculator(String name, Device device) {
@@ -87,7 +86,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 	public int[] calculateMandelbrotIterations(int width, int height) {
 		MandelbrotKernel kernel = new MandelbrotKernel(width, height);
 		
-		kernel.execute(Range.create2D(device, width, height));
+		kernel.execute(Range.create2D(device, width, height, 1, device.getMaxWorkGroupSize()));
 		kernel.dispose();
 		
 		return kernel.getInterations();
