@@ -25,6 +25,8 @@ public class Mandelbrot {
 			new AparapiMandelbrotCalculator("Aparapi on GPU", Device.firstGPU()));
 
 	public static void main(String[] args) throws Exception {
+		warmup();
+		
 		for (MandelbrotCalculator calculator : calculators) {
 			String name = calculator.toString();
 			long start = System.currentTimeMillis();
