@@ -1,4 +1,4 @@
-package ch.fhnw.conpr;
+package ch.fhnw.conpr.mandel;
 
 import ch.fhnw.conpr.mandel.AparapiMandelbrotCalculator;
 import ch.fhnw.conpr.mandel.MandelbrotCalculator;

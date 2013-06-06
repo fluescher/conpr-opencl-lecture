@@ -1,4 +1,4 @@
-package ch.fhnw.conpr;
+package ch.fhnw.conpr.mandel;
 
 import static org.junit.Assert.assertEquals;
 
