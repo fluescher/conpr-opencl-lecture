@@ -65,7 +65,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 			return iterations;
 		}
 		
-		public int[] getInterations() {
+		public int[] getIterations() {
 			return rgb;
 		}
 	}
@@ -89,7 +89,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 		kernel.execute(Range.create2D(device, width, height, 1, device.getMaxWorkGroupSize()));
 		kernel.dispose();
 		
-		return kernel.getInterations();
+		return kernel.getIterations();
 	}
 	
 	@Override
