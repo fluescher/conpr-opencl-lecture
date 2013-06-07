@@ -10,9 +10,9 @@ public class AparapiGridCalculation {
 	
 	/**
 	 * Calculates
-	 * <p>
-	 * <code> dose[x][y][z] = sum of exp(i) for each i from 0 to densities[x][y][z]</code>
-	 * </p>
+	 * <p><code>
+	 * dose[x][y][z] = sum of exp(i) for each i from 0 to densities[x][y][z]
+	 * </code></p>
 	 * for every voxel (three dimensional pixel) in the dose array.
 	 * 
 	 * @author Florian Luescher
