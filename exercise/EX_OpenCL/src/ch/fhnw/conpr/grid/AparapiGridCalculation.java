@@ -1,7 +1,7 @@
 package ch.fhnw.conpr.grid;
 
-import com.amd.aparapi.Device;
 import com.amd.aparapi.Kernel;
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.amd.aparapi.Range;
 
 public class AparapiGridCalculation {
@@ -84,12 +84,15 @@ public class AparapiGridCalculation {
 		printGridPlane(densities, GRID_SIZE/2);
 		
 		/* let aparapi compile to opencl c code */
-		runAlgorithm(Range.create3D(Device.firstCPU(),GRID_SIZE,GRID_SIZE,GRID_SIZE), densities);
+		runAlgorithm(Range.create3D(GRID_SIZE,GRID_SIZE,GRID_SIZE), densities, EXECUTION_MODE.CPU);
+		/* let jvm warmup */
+		runAlgorithm(Range.create3D(GRID_SIZE,GRID_SIZE,GRID_SIZE), densities, EXECUTION_MODE.JTP);
 		
 		for(int i = 0; i < ITERATIONS; i++) {
-			long cpuTime = runTime(Range.create3D(Device.firstCPU(),GRID_SIZE,GRID_SIZE,GRID_SIZE), densities);
-			long gpuTime = runTime(Range.create3D(Device.firstGPU(),GRID_SIZE,GRID_SIZE,GRID_SIZE), densities);
-			System.out.printf("CPU: %4d\tGPU: %4d%n", cpuTime, gpuTime);
+			long jtpTime = runTime(Range.create3D(GRID_SIZE,GRID_SIZE,GRID_SIZE), densities, EXECUTION_MODE.JTP);
+			long cpuTime = runTime(Range.create3D(GRID_SIZE,GRID_SIZE,GRID_SIZE), densities, EXECUTION_MODE.CPU);
+			long gpuTime = runTime(Range.create3D(GRID_SIZE,GRID_SIZE,GRID_SIZE), densities, EXECUTION_MODE.GPU);
+			System.out.printf("JTP: %4d\tCPU: %4d\tGPU: %4d%n", jtpTime, cpuTime, gpuTime);
 		}
 	}
 	
@@ -102,16 +105,17 @@ public class AparapiGridCalculation {
 		}
 	}
 	
-	public static long runTime(Range range, int[] densities) {
+	public static long runTime(Range range, int[] densities, EXECUTION_MODE mode) {
 		long start = System.currentTimeMillis();
 		
-		runAlgorithm(range, densities);
+		runAlgorithm(range, densities, mode);
 		
 		return System.currentTimeMillis() - start;
 	}
 	
-	public static float[] runAlgorithm(Range range, int[] densities) {
+	public static float[] runAlgorithm(Range range, int[] densities, EXECUTION_MODE mode) {
 		GridCalculationKernel kernel = new GridCalculationKernel(densities);
+		kernel.setExecutionMode(mode);
 		kernel.execute(range);
 		return kernel.getDose();
 	}
