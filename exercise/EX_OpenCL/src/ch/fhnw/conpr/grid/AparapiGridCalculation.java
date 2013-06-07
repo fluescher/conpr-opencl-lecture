@@ -8,6 +8,15 @@ public class AparapiGridCalculation {
 
 	private static final int GRID_SIZE = 10;
 	
+	/**
+	 * Calculates
+	 * <p>
+	 * <code> dose[x][y][z] = sum of exp(i) for each i from 0 to densities[x][y][z]</code>
+	 * </p>
+	 * for every voxel (three dimensional pixel) in the dose array.
+	 * 
+	 * @author Florian Luescher
+	 */
 	public static final class GridCalculationKernel extends Kernel {
 		
 		private int[] densities;
