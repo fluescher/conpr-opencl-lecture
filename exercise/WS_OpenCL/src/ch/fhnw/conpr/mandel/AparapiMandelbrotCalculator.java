@@ -29,15 +29,7 @@ public class AparapiMandelbrotCalculator implements MandelbrotCalculator {
 		
 		@Override
 		public void run() {
-			int x = getGlobalId(0);
-			int y = getGlobalId(1);
-			
-			if(x > width || y > height) return;
-			
-			float re = MandelbrotKernel.RE_MIN + x * RE_PER_PIXEL; // map pixel to complex plane
-			float im = MandelbrotKernel.IM_MIN + y * IM_PER_PIXEL; // map pixel to complex plane
-			
-			rgb[x*width + y] = MandelbrotKernel.mandel(re, im);
+			// TODO Implement Mandelbrot calculation
 		}
 		
 		/**
